@@ -1,0 +1,12 @@
+{
+  "appId": "br.com.cbro.financas",
+  "appName": "Finanças IA",
+  "webDir": "public",
+  "server": {
+    "url": "https://financas-gabriel.duckdns.org",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

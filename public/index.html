@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#080b12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Finanças — Gabriel & Ana</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- TOP BAR EXECUTIVA -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-monogram">
+          <span>G</span>
+          <span class="sep">&</span>
+          <span class="pink">H</span>
+        </div>
+        <div class="brand-meta">
+          <div class="brand-title">Finanças <span>Casal</span></div>
+          <div class="brand-badge"><span class="pulse-dot"></span> NVIDIA AI Conclusor</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Modo Privacidade (Olhinho) -->
+        <button type="button" class="btn-privacy" id="btn-privacy" onclick="alternarPrivacidade()" title="Ocultar/Exibir Valores">
+          <span id="privacy-icon">👁️</span>
+        </button>
+
+        <!-- Seletor de Perfil Tátil (Gabriel & Ana) -->
+        <div class="user-toggle">
+          <button type="button" class="toggle-btn active gabriel" id="btn-perfil-gabriel" onclick="definirPerfilAtivo('Gabriel')">
+            <span class="avatar-mini g">G</span>
+            <span class="toggle-name">Gabriel</span>
+          </button>
+          <button type="button" class="toggle-btn ana" id="btn-perfil-ana" onclick="definirPerfilAtivo('Ana')">
+            <span class="avatar-mini h">H</span>
+            <span class="toggle-name">Ana</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- NAVEGADOR TEMPORAL -->
+    <div class="month-nav">
+      <button type="button" class="nav-arrow" onclick="mudarMes(-1)" title="Mês Anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="nav-center">
+        <span class="nav-month" id="mes-titulo">Outubro / 2026</span>
+        <button type="button" class="btn-today" id="btn-voltar-hoje" style="display:none;" onclick="irParaMesAtual()">Voltar ao mês atual</button>
+      </div>
+      <button type="button" class="nav-arrow" onclick="mudarMes(1)" title="Próximo Mês">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <!-- CARTÃO EXECUTIVO DO CASAL (BLACK TITANIUM CARD) -->
+    <div class="card-executive">
+      <div class="card-chip-row">
+        <div class="card-chip"></div>
+        <div class="card-brand-tag">GABRIEL & ANA • CONJUNTA</div>
+      </div>
+
+      <div class="card-main-balance">
+        <div class="balance-label">Sobra do Mês (Renda − Gastos)</div>
+        <div class="balance-value masked-sensitive" id="saldo-liquido-valor">R$ 0,00</div>
+        <div class="balance-status" id="saldo-status">
+          <span class="status-pill positive" id="saldo-taxa-badge">0% Guardado</span>
+        </div>
+      </div>
+
+      <!-- Métricas em 3 Colunas: Renda, Gastos e Balanço -->
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <div class="metric-icon green">📥</div>
+          <div class="metric-info">
+            <span class="m-label">Renda Total</span>
+            <span class="m-val masked-sensitive" id="total-renda-valor">R$ 0,00</span>
+          </div>
+          <button type="button" class="btn-add-salary" onclick="abrirModalSalario()" title="Lançar Salário">+</button>
+        </div>
+
+        <div class="metric-item">
+          <div class="metric-icon red">📤</div>
+          <div class="metric-info">
+            <span class="m-label">Gastos Totais</span>
+            <span class="m-val masked-sensitive" id="total-gastos-valor">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div class="metric-item">
+          <div class="metric-icon purple">⚖️</div>
+          <div class="metric-info">
+            <span class="m-label">Total Despesas</span>
+            <span class="m-val" id="total-qtd-despesas">0 itens</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Divisão Proporcional do Casal -->
+      <div class="split-section">
+        <div class="split-info">
+          <div class="split-user-tag gabriel" onclick="filtrarPorPessoa('Gabriel')">
+            <span class="dot g"></span>
+            <span class="name">Gabriel:</span>
+            <strong class="masked-sensitive" id="split-val-gabriel">R$ 0,00</strong>
+            <span class="pct" id="split-pct-gabriel">(0%)</span>
+          </div>
+          <div class="split-user-tag ana" onclick="filtrarPorPessoa('Ana')">
+            <span class="dot h"></span>
+            <span class="name">Ana:</span>
+            <strong class="masked-sensitive" id="split-val-ana">R$ 0,00</strong>
+            <span class="pct" id="split-pct-ana">(0%)</span>
+          </div>
+        </div>
+        
+        <div class="progress-track" title="Distribuição de gastos entre o casal">
+          <div class="progress-fill gabriel" id="split-bar-gabriel" style="width: 50%;"></div>
+          <div class="progress-fill ana" id="split-bar-ana" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- Botão IA Advisor -->
+      <div class="card-footer-action">
+        <button type="button" class="btn-ai-glow" onclick="obterConsultoriaIA()">
+          <span class="sparkle">✨</span> Consultoria Executiva NVIDIA Nemotron 550B
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS DE NAVEGAÇÃO INTERATIVA -->
+    <div class="app-tabs">
+      <button type="button" class="tab-btn active" id="tab-btn-feed" onclick="trocarAba('feed')">
+        <span class="tab-icon">📑</span>
+        <span>Extrato</span>
+      </button>
+      <button type="button" class="tab-btn" id="tab-btn-charts" onclick="trocarAba('charts')">
+        <span class="tab-icon">📊</span>
+        <span>Gráficos & Raio-X</span>
+      </button>
+      <button type="button" class="tab-btn" id="tab-btn-salarios" onclick="trocarAba('salarios')">
+        <span class="tab-icon">💰</span>
+        <span>Salários & Rendas</span>
+      </button>
+      <button type="button" class="tab-btn" id="tab-btn-advisor" onclick="trocarAba('advisor')">
+        <span class="tab-icon">🧠</span>
+        <span>Auditoria IA</span>
+      </button>
+    </div>
+
+    <!-- CONTEÚDO DA ABA 1: EXTRATO (FEED DE TRANSAÇÕES) -->
+    <section class="tab-content active" id="tab-content-feed">
+      
+      <!-- Barra de Pesquisa e Filtros -->
+      <div class="filter-toolbar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="filtro-busca" placeholder="Buscar por loja, item ou observação..." oninput="filtrarPorTexto(this.value)">
+        </div>
+
+        <div class="filter-resp-pill">
+          <select id="filtro-resp" onchange="carregarDados()">
+            <option value="Todos">👥 Todos</option>
+            <option value="Gabriel">🟢 Só Gabriel</option>
+            <option value="Ana">🟣 Só Ana</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Carrossel de Categorias -->
+      <div class="cat-slider" id="categorias-slider">
+        <button type="button" class="cat-chip active" onclick="filtrarCategoria('Todas', this)">Todas</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Supermercado', this)">🛒 Supermercado</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Alimentação', this)">🍔 Alimentação</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Transporte', this)">🚗 Transporte</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Moradia', this)">🏠 Moradia</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Saúde', this)">💊 Saúde</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Lazer', this)">🎉 Lazer</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Compras', this)">🛍️ Compras</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Contas/Serviços', this)">⚡ Contas</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Educação', this)">📚 Educação</button>
+        <button type="button" class="cat-chip" onclick="filtrarCategoria('Outros', this)">📦 Outros</button>
+      </div>
+
+      <!-- Feed com agrupamento por datas -->
+      <div class="transactions-container" id="gastos-lista">
+        <!-- Inserido dinamicamente via JS -->
+      </div>
+    </section>
+
+    <!-- CONTEÚDO DA ABA 2: GRÁFICOS & RAIO-X INTERATIVO -->
+    <section class="tab-content" id="tab-content-charts">
+      <div class="charts-view">
+        
+        <!-- Card Gráfico Donut de Categorias -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Categorias de Gastos</h3>
+            <span class="chart-subtitle">Onde o dinheiro do casal foi aplicado</span>
+          </div>
+
+          <div class="donut-chart-container">
+            <svg class="donut-svg" id="donut-svg" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#161f33" stroke-width="14"></circle>
+              <!-- Fatias SVG dinâmicas -->
+            </svg>
+            <div class="donut-center-info">
+              <span class="donut-hover-pct" id="donut-center-pct">100%</span>
+              <span class="donut-hover-title" id="donut-center-title">Total</span>
+              <span class="donut-hover-val masked-sensitive" id="donut-center-val">R$ 0,00</span>
+            </div>
+          </div>
+
+          <div class="chart-legend-grid" id="chart-legend-categories">
+            <!-- Legenda com percentuais e valores -->
+          </div>
+        </div>
+
+        <!-- Card Balanço Financeiro Gabriel vs Ana -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Balanço Individual: Salário vs Gastos</h3>
+            <span class="chart-subtitle">Quanto cada um contribuiu e quanto sobrou</span>
+          </div>
+
+          <div class="couple-bars-container" id="couple-comparison-bars">
+            <!-- Barras comparativas Gabriel vs Ana -->
+          </div>
+        </div>
+
+        <!-- Card Formas de Pagamento -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Métodos de Pagamento</h3>
+            <span class="chart-subtitle">Pix, Cartão de Crédito, Débito e Boleto</span>
+          </div>
+          <div class="payment-methods-list" id="payment-methods-list">
+            <!-- Métodos -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CONTEÚDO DA ABA 3: SALÁRIOS & RENDAS -->
+    <section class="tab-content" id="tab-content-salarios">
+      <div class="salarios-view">
+        <div class="salarios-header">
+          <div>
+            <h3>Salários e Rendas do Mês</h3>
+            <p>Cadastre o salário fixo ou receitas extras do casal para calcular o saldo real.</p>
+          </div>
+          <button type="button" class="btn-primary-inline" onclick="abrirModalSalario()">
+            + Novo Salário
+          </button>
+        </div>
+
+        <div class="salarios-cards-grid">
+          <!-- Card Gabriel Salário -->
+          <div class="salario-user-card gabriel">
+            <div class="sal-card-top">
+              <div class="user-badge g">G</div>
+              <div>
+                <strong>Gabriel</strong>
+                <span>Salário & Entradas</span>
+              </div>
+            </div>
+            <div class="sal-card-val masked-sensitive" id="view-salario-gabriel">R$ 0,00</div>
+            <div class="sal-card-foot">
+              <span>Gastou: <strong class="masked-sensitive" id="view-gasto-gabriel">R$ 0,00</strong></span>
+              <span id="view-saldo-gabriel-pill" class="pill-saldo">Sobra: R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Card Ana Salário -->
+          <div class="salario-user-card ana">
+            <div class="sal-card-top">
+              <div class="user-badge h">H</div>
+              <div>
+                <strong>Ana</strong>
+                <span>Salário & Entradas</span>
+              </div>
+            </div>
+            <div class="sal-card-val masked-sensitive" id="view-salario-ana">R$ 0,00</div>
+            <div class="sal-card-foot">
+              <span>Gastou: <strong class="masked-sensitive" id="view-gasto-ana">R$ 0,00</strong></span>
+              <span id="view-saldo-ana-pill" class="pill-saldo">Sobra: R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="receitas-list-title">Lançamentos de Renda deste Mês</div>
+        <div class="receitas-lista" id="receitas-lista">
+          <!-- Lista de receitas -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTEÚDO DA ABA 4: AUDITORIA IA (NVIDIA NEMOTRON 550B) -->
+    <section class="tab-content" id="tab-content-advisor">
+      <div class="advisor-view">
+        <div class="advisor-hero">
+          <div class="advisor-badge">NVIDIA NEMOTRON 3 ULTRA 550B • AUDITOR MESTRE</div>
+          <h2>Diagnóstico Financeiro do Casal</h2>
+          <p>Raciocínio profundo sobre a dinâmica orçamentária de Gabriel e Ana.</p>
+          <button type="button" class="btn-refresh-ai" onclick="obterConsultoriaIA()">
+            🔄 Atualizar Diagnóstico com IA
+          </button>
+        </div>
+
+        <div class="advisor-body" id="advisor-body">
+          <div class="advisor-placeholder">
+            <div class="pulse-ring"></div>
+            <p>Carregando diagnóstico financeiro inteligente...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- BARRA DE AÇÕES INFERIOR FLUTUANTE (DOCK) -->
+  <div class="action-dock">
+    <button type="button" class="dock-action" onclick="abrirModalManual()" title="Lançar Manualmente">
+      <span class="dock-icon">✏️</span>
+      <span class="dock-lbl">Lançar</span>
+    </button>
+
+    <!-- BOTÃO PRINCIPAL DE SCANNER COM IA (DESTAQUE HOLOGRÁFICO) -->
+    <button type="button" class="dock-scan-btn" onclick="acionarScanner()" title="Escanear Comprovante com IA">
+      <div class="scan-ring"></div>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+        <circle cx="12" cy="13" r="4"></circle>
+      </svg>
+      <span class="scan-text">Escanear</span>
+    </button>
+
+    <button type="button" class="dock-action" onclick="exportarCSV()" title="Exportar para Excel / CSV">
+      <span class="dock-icon">📥</span>
+      <span class="dock-lbl">Planilha</span>
+    </button>
+  </div>
+
+  <!-- INPUTS INVISÍVEIS PARA CÂMERA E ARQUIVOS -->
+  <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="processarArquivoSelecionado(this.files[0])">
+  <input type="file" id="galeria-input" accept="image/*" style="display:none;" onchange="processarArquivoSelecionado(this.files[0])">
+  <input type="file" id="pdf-input" accept="application/pdf,image/*" style="display:none;" onchange="processarArquivoSelecionado(this.files[0])">
+
+  <!-- MODAL: ESCOLHER ORIGEM DA CAPTURA -->
+  <div class="modal-overlay" id="modal-escolha-origem">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <h3>Capturar Comprovante</h3>
+        <button type="button" class="modal-close" onclick="fecharModalEscolha()">✕</button>
+      </div>
+      <p class="modal-desc">A visão inteligente lê o documento e a NVIDIA Nemotron 550B conclui o gasto automaticamente.</p>
+      
+      <div class="capture-options">
+        <button type="button" class="capture-btn" onclick="abrirCamera()">
+          <div class="c-icon">📷</div>
+          <div class="c-text">
+            <strong>Câmera na Hora</strong>
+            <span>Tire uma foto do cupom ou recibo</span>
+          </div>
+        </button>
+
+        <button type="button" class="capture-btn" onclick="abrirGaleria()">
+          <div class="c-icon">🖼️</div>
+          <div class="c-text">
+            <strong>Foto da Galeria</strong>
+            <span>Print de Pix, comprovante ou foto salva</span>
+          </div>
+        </button>
+
+        <button type="button" class="capture-btn" onclick="abrirDocumento()">
+          <div class="c-icon">📄</div>
+          <div class="c-text">
+            <strong>Arquivo PDF / Fatura</strong>
+            <span>Boletos, faturas e extratos em PDF</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SCANNER VISOR HOLOGRÁFICO (PROGRESSO IA) -->
+  <div class="modal-overlay" id="modal-scanner">
+    <div class="modal-card modal-compact text-center">
+      <div class="hud-scanner-box">
+        <div class="hud-corners"></div>
+        <div class="laser-beam"></div>
+        <div class="hud-grid-bg"></div>
+        <div class="hud-chip-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="4"></rect>
+            <path d="M7 2v20 M17 2v20 M2 7h20 M2 17h20"></path>
+          </svg>
+        </div>
+        <div class="hud-step-title" id="scanner-status">1/2: Lendo comprovante com visão IA...</div>
+      </div>
+      <p class="hud-desc">O modelo <strong>NVIDIA Nemotron 3 Ultra 550B</strong> é o árbitro final que audita e classifica as finanças do casal.</p>
+    </div>
+  </div>
+
+  <!-- MODAL: FORMULÁRIO DE GASTO (NOVO OU EDITAR) -->
+  <div class="modal-overlay" id="modal-confirmacao">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-form-title">Registrar Despesa</h3>
+        <button type="button" class="modal-close" onclick="fecharModalConfirmacao()">✕</button>
+      </div>
+
+      <form id="form-gasto" onsubmit="salvarGastoForm(event)">
+        <!-- ID oculto para saber se é criação ou edição -->
+        <input type="hidden" id="form-gasto-id">
+        <input type="hidden" id="form-comprovante-nome">
+
+        <!-- Campo Valor em Destaque -->
+        <div class="amount-field-container">
+          <label>Valor Pago</label>
+          <div class="amount-input-box">
+            <span class="currency-prefix">R$</span>
+            <input type="number" step="0.01" class="amount-input" id="form-valor" required placeholder="0,00">
+          </div>
+        </div>
+
+        <!-- Seletor do Responsável (Gabriel vs Ana) -->
+        <div class="form-row">
+          <label class="field-label">Quem Pagou?</label>
+          <div class="payer-selector">
+            <label class="payer-card gabriel">
+              <input type="radio" name="form_resp" value="Gabriel" id="resp-radio-gabriel" checked>
+              <div class="payer-content">
+                <span class="avatar-chip g">G</span>
+                <span>Gabriel</span>
+              </div>
+            </label>
+            <label class="payer-card ana">
+              <input type="radio" name="form_resp" value="Ana" id="resp-radio-ana">
+              <div class="payer-content">
+                <span class="avatar-chip h">H</span>
+                <span>Ana</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="form-estabelecimento">Estabelecimento / Loja / Destinatário</label>
+          <input type="text" class="custom-input" id="form-estabelecimento" required placeholder="Ex: Supermercado Carrefour, Farmácia">
+        </div>
+
+        <div class="form-columns-2">
+          <div class="form-row">
+            <label class="field-label" for="form-categoria">Categoria</label>
+            <select class="custom-select" id="form-categoria">
+              <option value="Supermercado">🛒 Supermercado</option>
+              <option value="Alimentação">🍔 Alimentação</option>
+              <option value="Transporte">🚗 Transporte</option>
+              <option value="Moradia">🏠 Moradia</option>
+              <option value="Saúde">💊 Saúde</option>
+              <option value="Lazer">🎉 Lazer</option>
+              <option value="Compras">🛍️ Compras</option>
+              <option value="Contas/Serviços">⚡ Contas/Serviços</option>
+              <option value="Educação">📚 Educação</option>
+              <option value="Outros">📦 Outros</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="field-label" for="form-metodo">Pagamento</label>
+            <select class="custom-select" id="form-metodo">
+              <option value="Pix">Pix</option>
+              <option value="Cartão de Crédito">Cartão de Crédito</option>
+              <option value="Débito">Débito</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Boleto">Boleto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="form-data">Data da Compra</label>
+          <input type="date" class="custom-input" id="form-data" required>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="form-observacoes">Observações / Detalhes</label>
+          <input type="text" class="custom-input" id="form-observacoes" placeholder="Ex: Compras da semana, gasolina aditivada">
+        </div>
+
+        <button type="submit" class="btn-confirm-save" id="btn-salvar-gasto">
+          Salvar Lançamento
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LANÇAR / EDITAR SALÁRIO / RENDA -->
+  <div class="modal-overlay" id="modal-salario">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <h3 id="modal-salario-title">Lançar Salário / Entrada</h3>
+        <button type="button" class="modal-close" onclick="fecharModalSalario()">✕</button>
+      </div>
+
+      <form id="form-salario" onsubmit="salvarSalarioForm(event)">
+        <input type="hidden" id="form-salario-id">
+
+        <div class="amount-field-container">
+          <label>Valor da Renda (R$)</label>
+          <div class="amount-input-box">
+            <span class="currency-prefix">R$</span>
+            <input type="number" step="0.01" class="amount-input green-glow" id="salario-valor" required placeholder="0,00">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label">Titular do Salário / Receita</label>
+          <div class="payer-selector">
+            <label class="payer-card gabriel">
+              <input type="radio" name="salario_resp" value="Gabriel" id="sal-radio-gabriel" checked>
+              <div class="payer-content">
+                <span class="avatar-chip g">G</span>
+                <span>Gabriel</span>
+              </div>
+            </label>
+            <label class="payer-card ana">
+              <input type="radio" name="salario_resp" value="Ana" id="sal-radio-ana">
+              <div class="payer-content">
+                <span class="avatar-chip h">H</span>
+                <span>Ana</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="salario-descricao">Descrição</label>
+          <input type="text" class="custom-input" id="salario-descricao" required placeholder="Ex: Salário Mensal, Bônus, Freelance">
+        </div>
+
+        <div class="form-columns-2">
+          <div class="form-row">
+            <label class="field-label" for="salario-categoria">Categoria</label>
+            <select class="custom-select" id="salario-categoria">
+              <option value="Salário">💼 Salário Fixo</option>
+              <option value="Bônus">🎁 Bônus / PLR</option>
+              <option value="Freelance">💻 Freelance / Extra</option>
+              <option value="Investimentos">📈 Rendimentos</option>
+              <option value="Outros">📦 Outros</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="field-label" for="salario-data">Data</label>
+            <input type="date" class="custom-input" id="salario-data" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-confirm-save green-bg" id="btn-salvar-salario">
+          Confirmar Salário
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

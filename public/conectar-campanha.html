@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conectar WhatsApp — Campanha JK 7077</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #07090e;
+      color: #f8fafc;
+      font-family: 'Instrument Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #121826;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      color: #22d3ee;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .qr-container {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      margin: 0 auto 20px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .status-box {
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 18px;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .connected-box {
+      display: none;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #34d399;
+      padding: 24px 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+    .btn-restart {
+      background: #1a2438;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-restart:hover {
+      background: #23314d;
+    }
+    .btn-restart:active {
+      transform: scale(0.96);
+    }
+    .steps {
+      margin-top: 22px;
+      text-align: left;
+      background: #090e1a;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .steps strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="badge">Evolution API • Instância jkvemai</div>
+    <h2>WhatsApp JK 7077</h2>
+    <p>Conecte o chip da campanha para iniciar os disparos de forma isolada.</p>
+
+    <!-- Caixa de Conectado -->
+    <div class="connected-box" id="connected-banner">
+      🎉 WhatsApp Conectado com Sucesso!<br>
+      <span style="font-size: 12px; font-weight: 500; color: #a7f3d0;">A instância JK 7077 está pronta para os envios.</span>
+    </div>
+
+    <!-- Caixa de QR Code -->
+    <div id="qr-section">
+      <div class="qr-container">
+        <img id="qrcode" class="qr-img" src="" alt="Carregando QR Code..." />
+      </div>
+
+      <div class="status-box" id="status-text">
+        <span>🔄 Atualizando QR Code em tempo real...</span>
+      </div>
+
+      <button type="button" class="btn-restart" onclick="forcarNovoQR()">Gerar Novo Código</button>
+    </div>
+
+    <div class="steps">
+      <strong>Como conectar no celular:</strong><br>
+      1. Abra o WhatsApp do chip da campanha<br>
+      2. Toque nos 3 pontinhos &gt; <strong>Aparelhos conectados</strong><br>
+      3. Toque em <strong>Conectar um aparelho</strong> e aponte para a tela
+    </div>
+  </div>
+
+  <script>
+    let intervalId = null;
+
+    async function checarStatus() {
+      try {
+        const res = await fetch('/api/qr-campanha');
+        const data = await res.json();
+
+        if (data.status === 'open' || data.connected) {
+          document.getElementById('qr-section').style.display = 'none';
+          document.getElementById('connected-banner').style.display = 'block';
+          if (intervalId) clearInterval(intervalId);
+          return;
+        }
+
+        const b64 = data.base64 || (data.qrcode && data.qrcode.base64);
+        if (b64) {
+          const img = document.getElementById('qrcode');
+          if (img.src !== b64) {
+            img.src = b64;
+          }
+          document.getElementById('status-text').innerHTML = '<span>⚡ QR Code ativo! Aponte o WhatsApp.</span>';
+        } else if (data.status === 'connecting') {
+          document.getElementById('status-text').innerHTML = '<span>⏳ Inicializando conexão WhatsApp...</span>';
+        }
+      } catch (err) {
+        document.getElementById('status-text').innerText = 'Tentando reconectar...';
+      }
+    }
+
+    async function forcarNovoQR() {
+      document.getElementById('status-text').innerText = 'Reiniciando instância e gerando novo QR Code...';
+      try {
+        await fetch('/api/qr-campanha/restart', { method: 'POST' });
+        setTimeout(checarStatus, 2000);
+      } catch (e) {
+        checarStatus();
+      }
+    }
+
+    // Polling a cada 3.5 segundos para garantir que o QR Code nunca expire na tela
+    checarStatus();
+    intervalId = setInterval(checarStatus, 3500);
+  </script>
+</body>
+</html>

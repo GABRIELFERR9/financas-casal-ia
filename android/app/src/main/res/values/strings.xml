@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Finanças IA</string>
+    <string name="title_activity_main">Finanças IA</string>
+    <string name="package_name">br.com.cbro.financas</string>
+    <string name="custom_url_scheme">br.com.cbro.financas</string>
+</resources>

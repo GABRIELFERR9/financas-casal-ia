@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#1e293b" stroke-width="4"/>
+  
+  <!-- Círculo Gabriel -->
+  <circle cx="210" cy="230" r="100" fill="url(#emerald)" opacity="0.85"/>
+  <!-- Círculo Esposa -->
+  <circle cx="302" cy="230" r="100" fill="url(#purple)" opacity="0.85"/>
+  
+  <!-- Símbolo de Cifrão / Scanner Central -->
+  <path d="M256 140 V372 M210 180 C210 180 230 160 256 160 C285 160 305 180 305 205 C305 235 270 245 256 256 C242 267 207 277 207 307 C207 332 227 352 256 352 C282 352 302 332 302 332" 
+        stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Feixe de Scanner da IA -->
+  <line x1="120" y1="256" x2="392" y2="256" stroke="#22d3ee" stroke-width="6" stroke-dasharray="12 8" opacity="0.9"/>
+</svg>
